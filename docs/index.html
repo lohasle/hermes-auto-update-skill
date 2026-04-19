@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hermes Auto Update — Deploy & Auto-Upgrade Hermes Agent + WebUI</title>
-  <meta name="description" content="Zero-config local deployment skill for Hermes agent and WebUI. No Docker, systemd service, daily auto-upgrade. One prompt to any Hermes agent.">
+  <title>Hermes 自动更新 — 一键部署并自动升级 Hermes Agent + WebUI</title>
+  <meta name="description" content="Hermes Agent + WebUI 本机部署技能。无 Docker，systemd 服务，每日自动升级。一个提示词即可完成。">
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -146,7 +146,7 @@
     .hero h1 {
       font-size: clamp(36px, 5vw, 64px);
       font-weight: 600;
-      line-height: 1.00;
+      line-height: 1.05;
       letter-spacing: -2.4px;
       margin-bottom: 24px;
     }
@@ -415,12 +415,12 @@
             <path d="M8 1.5v13M2 5l6 3 6-3M8 8v6.5" stroke="#fff" stroke-width="1"/>
           </svg>
         </div>
-        <span class="logo-text">Hermes Auto Update</span>
+        <span class="logo-text">Hermes 自动更新</span>
       </a>
       <div class="links">
-        <a href="#features">Features</a>
-        <a href="#how-it-works">How it works</a>
-        <a href="#comparison">Why not Docker</a>
+        <a href="#features">功能特性</a>
+        <a href="#how-it-works">工作原理</a>
+        <a href="#comparison">为何不用 Docker</a>
         <a href="https://github.com/lohasle/hermes-auto-update-skill" class="btn-primary btn-dark">GitHub →</a>
       </div>
     </div>
@@ -428,86 +428,86 @@
 
   <!-- HERO -->
   <div class="hero">
-    <div class="badge">Open Source Skill · Hermes Agent</div>
-    <h1>Deploy Hermes.<br><span class="gradient">Auto-upgrade forever.</span></h1>
+    <div class="badge">开源技能 · Hermes Agent</div>
+    <h1>部署 Hermes。<br><span class="gradient">永远自动升级。</span></h1>
     <p class="subtitle">
-      One prompt to any Hermes agent — get hermes-agent + hermes-webui running locally 
-      with systemd, and daily auto-upgrade cron jobs. Zero config. No Docker.
+      一段提示词发给任意 Hermes agent —— 自动完成 hermes-agent + hermes-webui 本机部署，
+      systemd 服务托管，每日自动升级。零配置，不用 Docker。
     </p>
     <div class="actions">
-      <a href="#quick-start" class="btn-primary btn-dark">Get Started →</a>
-      <a href="https://github.com/lohasle/hermes-auto-update-skill/blob/main/SKILL.md" class="btn-primary btn-ghost">Read SKILL.md</a>
+      <a href="#quick-start" class="btn-primary btn-dark">开始使用 →</a>
+      <a href="https://github.com/lohasle/hermes-auto-update-skill/blob/main/SKILL.md" class="btn-primary btn-ghost">查看 SKILL.md</a>
     </div>
   </div>
 
   <!-- FEATURES -->
   <section id="features">
-    <div class="section-label">Features</div>
-    <div class="section-title">Everything you need.<br>Nothing you don't.</div>
-    <p class="section-desc">A single Hermes skill that handles deployment, service management, and ongoing upgrades — all automatically.</p>
+    <div class="section-label">功能特性</div>
+    <div class="section-title">该有的都有。<br>不该有的都没有。</div>
+    <p class="section-desc">一个 Hermes 技能搞定部署、服务管理和持续升级 —— 全自动。</p>
     <div class="features-grid">
       <div class="feature-card">
         <div class="icon icon-dark">⚙</div>
-        <h3>Zero-Config Auto-Detect</h3>
-        <p>All paths — HERMES_HOME, venv, webui directory — are discovered automatically. No manual placeholders. No editing configs.</p>
+        <h3>零配置自动探测</h3>
+        <p>HERMES_HOME、venv、webui 目录等所有路径自动发现。无需手动填路径，无需编辑配置文件。</p>
       </div>
       <div class="feature-card">
         <div class="icon icon-blue">↻</div>
-        <h3>Daily Auto-Upgrade</h3>
-        <p>Two cron jobs run at 3:00 AM daily — one for hermes-agent, one for hermes-webui. Git pull, restart, done. Zero downtime.</p>
+        <h3>每日自动升级</h3>
+        <p>两个 cron job 每天凌晨 3:00 执行 —— 分别更新 agent 和 webui。git pull、重启，零停机。</p>
       </div>
       <div class="feature-card">
         <div class="icon icon-red">■</div>
-        <h3>Systemd, Not Docker</h3>
-        <p>Native systemd service. Data lives in ~/.hermes, survives restarts and upgrades. No container rebuilds, no data loss.</p>
+        <h3>Systemd 原生服务</h3>
+        <p>原生 systemd 托管，数据存放在 ~/.hermes，重启和升级都不丢数据。无需容器重建。</p>
       </div>
       <div class="feature-card">
         <div class="icon icon-dark">⚡</div>
-        <h3>Shared Agent Venv</h3>
-        <p>WebUI runs on hermes-agent's venv — cron and tools modules are always available. No ModuleNotFoundError.</p>
+        <h3>共享 Agent 虚拟环境</h3>
+        <p>WebUI 直接使用 hermes-agent 的 venv 运行 —— cron 和 tools 模块始终可用，不会 ModuleNotFoundError。</p>
       </div>
       <div class="feature-card">
         <div class="icon icon-blue">✓</div>
-        <h3>Built-in Verification</h3>
-        <p>Every step has a verification gate. /api/crons and /api/skills must return 200 before the skill reports success.</p>
+        <h3>内建验证机制</h3>
+        <p>每一步都有验证关卡。/api/crons 和 /api/skills 必须正常返回 200，技能才报告成功。</p>
       </div>
       <div class="feature-card">
         <div class="icon icon-dark">◎</div>
-        <h3>Agent-Native</h3>
-        <p>Designed as a Hermes skill. Any agent loads it via skill_manage and executes it autonomously. No human in the loop.</p>
+        <h3>Agent 原生设计</h3>
+        <p>专为 Hermes 技能系统设计。任何 agent 通过 skill_manage 加载后自主执行，全程无需人工干预。</p>
       </div>
     </div>
   </section>
 
   <!-- HOW IT WORKS -->
   <section id="how-it-works">
-    <div class="section-label">How it works</div>
-    <div class="section-title">Three steps. One prompt.</div>
-    <p class="section-desc">Send the install prompt to any Hermes agent. It handles everything.</p>
+    <div class="section-label">工作原理</div>
+    <div class="section-title">三步搞定。一段提示词。</div>
+    <p class="section-desc">把安装提示词发给任意 Hermes agent，其余全自动。</p>
     <div class="pipeline">
       <div class="pipeline-step">
-        <div class="step-num">Step 1 — Deploy</div>
+        <div class="step-num">第一步 — 部署</div>
         <h3>Agent + WebUI</h3>
-        <p>Git clone hermes-agent and hermes-webui. Create venv, pip install, systemd service. Verify APIs respond.</p>
+        <p>Git clone hermes-agent 和 hermes-webui。创建 venv、pip install、注册 systemd 服务。验证 API 正常响应。</p>
       </div>
       <div class="pipeline-step">
-        <div class="step-num">Step 2 — Schedule</div>
-        <h3>Daily Cron Jobs</h3>
-        <p>Register two cron jobs — one for agent updates, one for webui. Both run git fetch, compare commits, pull if needed.</p>
+        <div class="step-num">第二步 — 调度</div>
+        <h3>每日定时任务</h3>
+        <p>注册两个 cron job —— 一个更新 agent，一个更新 webui。自动 git fetch、比对提交、按需 pull。</p>
       </div>
       <div class="pipeline-step">
-        <div class="step-num">Step 3 — Ship</div>
-        <h3>Register & Done</h3>
-        <p>Save as a Hermes skill for future reference. Data persists in ~/.hermes. Upgrades happen while you sleep.</p>
+        <div class="step-num">第三步 — 交付</div>
+        <h3>注册技能，完成</h3>
+        <p>保存为 Hermes 技能以备后用。数据持久化在 ~/.hermes。升级在你睡觉时自动完成。</p>
       </div>
     </div>
 
     <div class="code-section" id="quick-start">
       <div class="code-block">
         <div class="code-header">
-          <span class="code-lang">Quick Start — Paste to Hermes Agent</span>
+          <span class="code-lang">快速开始 — 粘贴到 Hermes Agent</span>
         </div>
-<pre><span class="comment"># Copy the prompt below and send to any Hermes agent</span>
+<pre><span class="comment"># 复制下方提示词，发给任意 Hermes agent 即可</span>
 
 <span class="prompt">请从 GitHub 加载技能 hermes-auto-update：</span>
 
@@ -527,43 +527,43 @@
 
   <!-- COMPARISON -->
   <section id="comparison">
-    <div class="section-label">Why not Docker</div>
-    <div class="section-title">Native beats containerized.</div>
-    <p class="section-desc">Docker caused data loss, module errors, and slow rebuilds. Systemd is faster, simpler, and your data survives.</p>
+    <div class="section-label">为何不用 Docker</div>
+    <div class="section-title">原生部署，碾压容器化。</div>
+    <p class="section-desc">Docker 会导致数据丢失、模块报错和缓慢的镜像重建。Systemd 更快、更简单，数据永远不会丢。</p>
     <div class="comparison">
       <table>
         <thead>
           <tr>
             <th></th>
             <th>Docker</th>
-            <th>Native systemd</th>
+            <th>原生 Systemd</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>Data persistence</td>
-            <td><span class="tag-bad">Container rebuild loses data</span></td>
-            <td><span class="tag-good">~/.hermes survives forever</span></td>
+            <td>数据持久性</td>
+            <td><span class="tag-bad">容器重建丢失数据</span></td>
+            <td><span class="tag-good">~/.hermes 永久保留</span></td>
           </tr>
           <tr>
             <td>cron / tools API</td>
-            <td><span class="tag-bad">500 errors without mount hacks</span></td>
-            <td><span class="tag-good">Agent venv, zero errors</span></td>
+            <td><span class="tag-bad">需挂载 hack 否则 500</span></td>
+            <td><span class="tag-good">Agent venv，零报错</span></td>
           </tr>
           <tr>
-            <td>Upgrade speed</td>
-            <td><span class="tag-bad">Rebuild image, minutes</span></td>
-            <td><span class="tag-good">git pull + restart, seconds</span></td>
+            <td>升级速度</td>
+            <td><span class="tag-bad">重建镜像，分钟级</span></td>
+            <td><span class="tag-good">git pull + restart，秒级</span></td>
           </tr>
           <tr>
-            <td>Configuration</td>
-            <td><span class="tag-bad">Mount paths, UID/GID mapping</span></td>
-            <td><span class="tag-good">Auto-detect, zero config</span></td>
+            <td>配置复杂度</td>
+            <td><span class="tag-bad">挂载路径、UID/GID 映射</span></td>
+            <td><span class="tag-good">自动探测，零配置</span></td>
           </tr>
           <tr>
-            <td>Resource usage</td>
-            <td><span class="tag-bad">Docker daemon overhead</span></td>
-            <td><span class="tag-good">Minimal, bare metal</span></td>
+            <td>资源占用</td>
+            <td><span class="tag-bad">Docker daemon 额外开销</span></td>
+            <td><span class="tag-good">最小化，裸金属运行</span></td>
           </tr>
         </tbody>
       </table>
@@ -572,11 +572,11 @@
 
   <!-- FOOTER -->
   <footer>
-    <div class="left">MIT License · Built for <a href="https://github.com/NousResearch/hermes-agent" style="color: var(--color-text); text-decoration: underline;">Hermes Agent</a></div>
+    <div class="left">MIT 协议 · 为 <a href="https://github.com/NousResearch/hermes-agent" style="color: var(--color-text); text-decoration: underline;">Hermes Agent</a> 而建</div>
     <div class="right">
       <a href="https://github.com/lohasle/hermes-auto-update-skill">GitHub</a>
       <a href="https://github.com/lohasle/hermes-auto-update-skill/blob/main/SKILL.md">SKILL.md</a>
-      <a href="https://github.com/lohasle/hermes-auto-update-skill/blob/main/README-human.md">Human Guide</a>
+      <a href="https://github.com/lohasle/hermes-auto-update-skill/blob/main/README-human.md">人类部署指南</a>
     </div>
   </footer>
 
