@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hermes Auto Update — Deploy & Auto-Upgrade Hermes Agent + WebUI</title>
+  <meta name="description" content="Zero-config local deployment skill for Hermes agent and WebUI. No Docker, systemd service, daily auto-upgrade. One prompt to any Hermes agent.">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --color-bg: #ffffff;
+      --color-text: #171717;
+      --color-text-secondary: #4d4d4d;
+      --color-text-tertiary: #666666;
+      --color-border: rgba(0, 0, 0, 0.08);
+      --color-accent: #0072f5;
+      --color-accent-bg: #ebf5ff;
+      --color-accent-text: #0068d6;
+      --color-ship: #ff5b4f;
+      --color-preview: #de1d8d;
+      --color-develop: #0a72ef;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-pill: 9999px;
+      --font-sans: 'Geist', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --font-liga: 'liga' 1;
+      --shadow-border: rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+      --shadow-card: rgba(0,0,0,0.08) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 2px, rgba(0,0,0,0.04) 0px 8px 8px -8px, #fafafa 0px 0px 0px 1px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      font-feature-settings: var(--font-liga);
+      color: var(--color-text);
+      background: var(--color-bg);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- NAV ---- */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-border);
+      padding: 0 24px;
+    }
+    nav .inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    nav .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--color-text);
+    }
+    nav .logo-icon {
+      width: 28px;
+      height: 28px;
+      background: var(--color-text);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    nav .logo-icon svg { width: 16px; height: 16px; }
+    nav .logo-text {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.32px;
+    }
+    nav .links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    nav .links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    nav .links a:hover { color: var(--color-text); }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .btn-dark {
+      background: var(--color-text);
+      color: var(--color-bg);
+    }
+    .btn-dark:hover { opacity: 0.85; }
+    .btn-ghost {
+      background: var(--color-bg);
+      color: var(--color-text);
+      box-shadow: var(--shadow-border);
+    }
+    .btn-ghost:hover { background: #fafafa; }
+
+    /* ---- HERO ---- */
+    .hero {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 120px 24px 100px;
+      text-align: center;
+    }
+    .hero .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--color-accent-bg);
+      color: var(--color-accent-text);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      margin-bottom: 24px;
+      font-feature-settings: 'tnum' 1;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 600;
+      line-height: 1.00;
+      letter-spacing: -2.4px;
+      margin-bottom: 24px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--color-develop), var(--color-preview), var(--color-ship));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero .subtitle {
+      font-size: clamp(16px, 2vw, 20px);
+      font-weight: 400;
+      line-height: 1.80;
+      color: var(--color-text-secondary);
+      max-width: 640px;
+      margin: 0 auto 40px;
+    }
+    .hero .actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* ---- SECTION ---- */
+    section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 24px;
+    }
+    section + section {
+      border-top: 1px solid #ebebeb;
+    }
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-tertiary);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(28px, 3.5vw, 40px);
+      font-weight: 600;
+      line-height: 1.20;
+      letter-spacing: -1.28px;
+      margin-bottom: 16px;
+    }
+    .section-desc {
+      font-size: 18px;
+      color: var(--color-text-secondary);
+      line-height: 1.56;
+      max-width: 640px;
+    }
+
+    /* ---- FEATURES GRID ---- */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .feature-card {
+      background: var(--color-bg);
+      box-shadow: var(--shadow-card);
+      border-radius: var(--radius-md);
+      padding: 32px;
+    }
+    .feature-card .icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 20px;
+    }
+    .icon-dark { background: var(--color-text); color: #fff; }
+    .icon-blue { background: var(--color-accent-bg); color: var(--color-accent-text); }
+    .icon-red  { background: #fff0ef; color: var(--color-ship); }
+    .feature-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.32px;
+      margin-bottom: 8px;
+    }
+    .feature-card p {
+      font-size: 15px;
+      color: var(--color-text-secondary);
+      line-height: 1.56;
+    }
+
+    /* ---- WORKFLOW PIPELINE ---- */
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .pipeline-step {
+      padding: 32px;
+      box-shadow: var(--shadow-card);
+      border-radius: var(--radius-md);
+      position: relative;
+    }
+    .pipeline-step .step-num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+    .pipeline-step:nth-child(1) .step-num { color: var(--color-develop); }
+    .pipeline-step:nth-child(2) .step-num { color: var(--color-preview); }
+    .pipeline-step:nth-child(3) .step-num { color: var(--color-ship); }
+    .pipeline-step h3 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.48px;
+      margin-bottom: 8px;
+    }
+    .pipeline-step p {
+      font-size: 15px;
+      color: var(--color-text-secondary);
+      line-height: 1.56;
+    }
+
+    /* ---- CODE BLOCK ---- */
+    .code-section {
+      margin-top: 48px;
+    }
+    .code-block {
+      background: #0a0a0a;
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      overflow-x: auto;
+      box-shadow: rgba(0,0,0,0.24) 0px 0px 0px 1px, rgba(0,0,0,0.06) 0px 2px 2px, rgba(0,0,0,0.08) 0px 16px 16px -8px;
+    }
+    .code-block .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .code-block .code-lang {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      color: #808080;
+      text-transform: uppercase;
+    }
+    .code-block pre {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.7;
+      color: #e5e5e5;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .code-block .comment { color: #666; }
+    .code-block .prompt { color: #7928ca; }
+    .code-block .cmd { color: #e5e5e5; }
+    .code-block .flag { color: #0070f3; }
+    .code-block .url { color: #0072f5; text-decoration: underline; }
+
+    /* ---- COMPARISON TABLE ---- */
+    .comparison {
+      margin-top: 48px;
+      overflow-x: auto;
+    }
+    .comparison table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+    .comparison th {
+      text-align: left;
+      padding: 12px 16px;
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--color-text-tertiary);
+      border-bottom: 1px solid #ebebeb;
+    }
+    .comparison td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f5f5f5;
+      color: var(--color-text-secondary);
+    }
+    .comparison td:first-child {
+      font-weight: 500;
+      color: var(--color-text);
+    }
+    .comparison tr:hover td { background: #fafafa; }
+    .tag-good {
+      display: inline-block;
+      background: #f0fdf4;
+      color: #15803d;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+    }
+    .tag-bad {
+      display: inline-block;
+      background: #fef2f2;
+      color: #dc2626;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+    }
+
+    /* ---- FOOTER ---- */
+    footer {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 48px 24px;
+      border-top: 1px solid #ebebeb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    footer .left {
+      font-size: 14px;
+      color: var(--color-text-tertiary);
+    }
+    footer .right {
+      display: flex;
+      gap: 20px;
+    }
+    footer a {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+    }
+    footer a:hover { color: var(--color-text); }
+
+    /* ---- MOBILE ---- */
+    @media (max-width: 768px) {
+      nav .links { display: none; }
+      .hero { padding: 80px 20px 60px; }
+      .hero h1 { letter-spacing: -1.6px; }
+      section { padding: 56px 20px; }
+      .features-grid, .pipeline { grid-template-columns: 1fr; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="inner">
+      <a href="https://github.com/lohasle/hermes-auto-update-skill" class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 1.5L2 5v6l6 3.5L14 11V5L8 1.5z" stroke="#fff" stroke-width="1.2" fill="none"/>
+            <path d="M8 1.5v13M2 5l6 3 6-3M8 8v6.5" stroke="#fff" stroke-width="1"/>
+          </svg>
+        </div>
+        <span class="logo-text">Hermes Auto Update</span>
+      </a>
+      <div class="links">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#comparison">Why not Docker</a>
+        <a href="https://github.com/lohasle/hermes-auto-update-skill" class="btn-primary btn-dark">GitHub →</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="badge">Open Source Skill · Hermes Agent</div>
+    <h1>Deploy Hermes.<br><span class="gradient">Auto-upgrade forever.</span></h1>
+    <p class="subtitle">
+      One prompt to any Hermes agent — get hermes-agent + hermes-webui running locally 
+      with systemd, and daily auto-upgrade cron jobs. Zero config. No Docker.
+    </p>
+    <div class="actions">
+      <a href="#quick-start" class="btn-primary btn-dark">Get Started →</a>
+      <a href="https://github.com/lohasle/hermes-auto-update-skill/blob/main/SKILL.md" class="btn-primary btn-ghost">Read SKILL.md</a>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="section-label">Features</div>
+    <div class="section-title">Everything you need.<br>Nothing you don't.</div>
+    <p class="section-desc">A single Hermes skill that handles deployment, service management, and ongoing upgrades — all automatically.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="icon icon-dark">⚙</div>
+        <h3>Zero-Config Auto-Detect</h3>
+        <p>All paths — HERMES_HOME, venv, webui directory — are discovered automatically. No manual placeholders. No editing configs.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon icon-blue">↻</div>
+        <h3>Daily Auto-Upgrade</h3>
+        <p>Two cron jobs run at 3:00 AM daily — one for hermes-agent, one for hermes-webui. Git pull, restart, done. Zero downtime.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon icon-red">■</div>
+        <h3>Systemd, Not Docker</h3>
+        <p>Native systemd service. Data lives in ~/.hermes, survives restarts and upgrades. No container rebuilds, no data loss.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon icon-dark">⚡</div>
+        <h3>Shared Agent Venv</h3>
+        <p>WebUI runs on hermes-agent's venv — cron and tools modules are always available. No ModuleNotFoundError.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon icon-blue">✓</div>
+        <h3>Built-in Verification</h3>
+        <p>Every step has a verification gate. /api/crons and /api/skills must return 200 before the skill reports success.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon icon-dark">◎</div>
+        <h3>Agent-Native</h3>
+        <p>Designed as a Hermes skill. Any agent loads it via skill_manage and executes it autonomously. No human in the loop.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works">
+    <div class="section-label">How it works</div>
+    <div class="section-title">Three steps. One prompt.</div>
+    <p class="section-desc">Send the install prompt to any Hermes agent. It handles everything.</p>
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <div class="step-num">Step 1 — Deploy</div>
+        <h3>Agent + WebUI</h3>
+        <p>Git clone hermes-agent and hermes-webui. Create venv, pip install, systemd service. Verify APIs respond.</p>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">Step 2 — Schedule</div>
+        <h3>Daily Cron Jobs</h3>
+        <p>Register two cron jobs — one for agent updates, one for webui. Both run git fetch, compare commits, pull if needed.</p>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">Step 3 — Ship</div>
+        <h3>Register & Done</h3>
+        <p>Save as a Hermes skill for future reference. Data persists in ~/.hermes. Upgrades happen while you sleep.</p>
+      </div>
+    </div>
+
+    <div class="code-section" id="quick-start">
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">Quick Start — Paste to Hermes Agent</span>
+        </div>
+<pre><span class="comment"># Copy the prompt below and send to any Hermes agent</span>
+
+<span class="prompt">请从 GitHub 加载技能 hermes-auto-update：</span>
+
+<span class="cmd">1.</span> 先执行: <span class="cmd">git clone</span> <span class="url">https://github.com/lohasle/hermes-auto-update-skill.git</span> <span class="flag">/tmp/hermes-auto-update-skill</span>
+<span class="cmd">2.</span> 读取 <span class="flag">/tmp/hermes-auto-update-skill/SKILL.md</span>，按照其中的步骤逐一执行
+<span class="cmd">3.</span> 执行完毕后，用 <span class="cmd">skill_manage</span> 将 SKILL.md 注册为技能 <span class="flag">hermes-auto-update</span>
+<span class="cmd">4.</span> 创建两个每日自动升级 cron job（详见 SKILL.md Step 6）
+
+<span class="comment">关键提醒：
+- 所有路径自动探测，不要问用户
+- 不用 Docker
+- 必须用 hermes-agent 的 venv python 跑 webui
+- 验证 /api/crons 和 /api/skills 都正常才算成功</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON -->
+  <section id="comparison">
+    <div class="section-label">Why not Docker</div>
+    <div class="section-title">Native beats containerized.</div>
+    <p class="section-desc">Docker caused data loss, module errors, and slow rebuilds. Systemd is faster, simpler, and your data survives.</p>
+    <div class="comparison">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Docker</th>
+            <th>Native systemd</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Data persistence</td>
+            <td><span class="tag-bad">Container rebuild loses data</span></td>
+            <td><span class="tag-good">~/.hermes survives forever</span></td>
+          </tr>
+          <tr>
+            <td>cron / tools API</td>
+            <td><span class="tag-bad">500 errors without mount hacks</span></td>
+            <td><span class="tag-good">Agent venv, zero errors</span></td>
+          </tr>
+          <tr>
+            <td>Upgrade speed</td>
+            <td><span class="tag-bad">Rebuild image, minutes</span></td>
+            <td><span class="tag-good">git pull + restart, seconds</span></td>
+          </tr>
+          <tr>
+            <td>Configuration</td>
+            <td><span class="tag-bad">Mount paths, UID/GID mapping</span></td>
+            <td><span class="tag-good">Auto-detect, zero config</span></td>
+          </tr>
+          <tr>
+            <td>Resource usage</td>
+            <td><span class="tag-bad">Docker daemon overhead</span></td>
+            <td><span class="tag-good">Minimal, bare metal</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="left">MIT License · Built for <a href="https://github.com/NousResearch/hermes-agent" style="color: var(--color-text); text-decoration: underline;">Hermes Agent</a></div>
+    <div class="right">
+      <a href="https://github.com/lohasle/hermes-auto-update-skill">GitHub</a>
+      <a href="https://github.com/lohasle/hermes-auto-update-skill/blob/main/SKILL.md">SKILL.md</a>
+      <a href="https://github.com/lohasle/hermes-auto-update-skill/blob/main/README-human.md">Human Guide</a>
+    </div>
+  </footer>
+
+</body>
+</html>
