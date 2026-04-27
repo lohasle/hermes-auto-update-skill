@@ -21,14 +21,7 @@ triggers:
 - Python 3.11+
 - 网络可访问 github.com
 
-## Git 身份严格规则（必须遵守）
 
-| GitHub 组织 | user.name | user.email | 禁止 |
-|-------------|-----------|------------|------|
-| github.com/lohasle/* | lohasle | lohasle@users.noreply.github.com | 严禁出现 @vanke 或 @onewo |
-| github.com/onewo-gesc/* | ful04_onewo | ful04_onewo@onewo.com | 严禁使用 lohasle 身份 |
-
-升级脚本中执行 git commit/push 前，必须先根据 remote URL 校验并设置正确的 user.name 和 user.email。
 
 ## 关键路径（自动探测）
 
@@ -241,7 +234,6 @@ Steps:
 | dashboard 页面空白/旧版本 | 升级 agent 后未重启 dashboard | 杀掉并重新启动 `hermes dashboard` |
 | 打开 webui 要重新 setup | STATE_DIR 不对 | 确保 state dir 在 HERMES_HOME 下 |
 | 局域网无法访问 | 绑定 127.0.0.1 | HERMES_WEBUI_HOST=0.0.0.0 |
-| git push 身份错误 | 混淆了 lohasle/onewo 身份 | 按上表严格校验 remote URL 后设置 |
 | git pull 冲突 | 本地有未提交修改 | 升级脚本先 git stash |
 
 ## 注意事项
